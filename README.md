@@ -135,7 +135,7 @@ biteship.action('retrieve').rates({
 ```
 
 Note:
-- Please see the payload [here](https://biteship.com/id/docs/api/rates/retrieve#rates-by-area-id).
+- Please see the payload to retrieve rates [here](https://biteship.com/id/docs/api/rates/retrieve#rates-by-area-id).
 
 #### Using Locations API
 **Create**
