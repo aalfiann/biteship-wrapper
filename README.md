@@ -155,7 +155,7 @@ biteship.action('create').locations({
 ```
 
 Note:
-- Please see the payload [here](https://biteship.com/id/docs/api/locations/create#standard-api-request).
+- Please see the payload to create locations [here](https://biteship.com/id/docs/api/locations/create#standard-api-request).
 
 **Retrieve**
 ```javascript
@@ -176,7 +176,7 @@ biteship.action('update').locations({
 });
 ```
 Note:
-- Please see the payload [here](https://biteship.com/id/docs/api/locations/update).
+- Please see the payload to update locations [here](https://biteship.com/id/docs/api/locations/update).
 
 **Delete**
 ```javascript
@@ -223,7 +223,7 @@ biteship.action('create').draftOrders({
 });
 ```
 Note:
-- Please see the payload [here](https://biteship.com/id/docs/api/draft_orders/create#without-courier).
+- Please see the payload to create draft orders [here](https://biteship.com/id/docs/api/draft_orders/create#without-courier).
 
 **Retrieve**
 ```javascript
@@ -248,8 +248,8 @@ biteship.action('retrieve')
 **Update**
 ```javascript
 biteship.action('update').draftOrders({
-  "courier_company": "sicepat",
-  "courier_type": "reg"
+  courier_company: "sicepat",
+  courier_type: "reg"
 }, 'ef18275c-02a9-4887-a56b-f374edb96ec4')
 .send(function(err, res) {
   if(err) return console.log(err);
@@ -257,7 +257,7 @@ biteship.action('update').draftOrders({
 });
 ```
 Note:
-- Please see the payload [here](https://biteship.com/id/docs/api/draft_orders/update#set-courier).
+- Please see the payload to update draft orders [here](https://biteship.com/id/docs/api/draft_orders/update#set-courier).
 
 **Confirm**
 ```javascript
@@ -323,7 +323,7 @@ biteship.action('create').orders({
 });
 ```
 Note:
-- Please see the payload [here](https://biteship.com/id/docs/api/orders/create#order-for-standard-couriers).
+- Please see the payload to create orders [here](https://biteship.com/id/docs/api/orders/create#order-for-standard-couriers).
 
 **Retrieve**
 ```javascript
