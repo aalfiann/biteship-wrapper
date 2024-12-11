@@ -74,8 +74,8 @@ class Biteship {
     }
 
     this.url = Biteship.baseUrl + '/' + this.api_version + '/maps/areas';
-    if(!payload.country) {
-      payload.country = 'ID';
+    if(!payload.countries) {
+      payload.countries = 'ID';
     }
     if(!payload.type) {
       payload.type = 'single';

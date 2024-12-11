@@ -11,7 +11,7 @@ describe('Endpoint maps test', function () {
   it('maps - retrieve', () => {
     const biteship = new Biteship(options);
     const result = biteship.action('retrieve').maps({ input: 'jakarta selatan' });
-    assert.strictEqual(result.url, 'https://api.biteship.com/v1/maps/areas?input=jakarta+selatan&country=ID&type=single');
+    assert.strictEqual(result.url, 'https://api.biteship.com/v1/maps/areas?input=jakarta+selatan&countries=ID&type=single');
     assert.strictEqual(result.method, 'get');
     assert.throws(function () {
       biteship.action('create').maps()

@@ -18,12 +18,16 @@ declare class Biteship {
   action(name: string): this;
 
   maps(payload: {
-    country?: string;
+    input: string;
+    countries?: string;
     type?: string;
-    [key: string]: any;
   }): this;
 
-  rates(payload: object): this;
+  rates(payload: {
+    couriers: string;
+    items: any[];
+    [key: string]: any;
+  }): this;
 
   locations(payload?: object | null, id?: string): this;
 
