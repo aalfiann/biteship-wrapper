@@ -10,7 +10,7 @@ describe('Biteship send async test', function () {
     });
     biteship.action('retrieve').maps({ input: 'jakarta selatan' }).sendAsync()
       .then(res => {
-        console.log(res);
+        // nothing to do here for test
       })
       .catch(err => {
         if (err) {
@@ -27,7 +27,9 @@ describe('Biteship send async test', function () {
     });
     try {
       const result = await biteship.action('retrieve').maps({ input: 'jakarta selatan' }).sendAsync();
-      console.log(result);
+      if(result) {
+        // nothing to do here for test
+      }
     } catch (err) {
       assert.strictEqual(err.status, 400);
       assert.strictEqual(err.success, false);
@@ -51,7 +53,9 @@ describe('Biteship send async test', function () {
         "longitude":102.22189911,
         "type":"origin",
       }).sendAsync();
-      console.log(result);
+      if(result) {
+        // nothing to do here for test
+      }
     } catch (err) {
       assert.strictEqual(err.status, 401);
       assert.strictEqual(err.success, false);

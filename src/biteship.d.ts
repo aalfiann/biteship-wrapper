@@ -1,3 +1,130 @@
+type BiteshipAction = 'create' | 'retrieve' | 'update' | 'delete' | 'confirm';
+
+interface Coordinate {
+  latitude: number;
+  longitude: number;
+}
+
+interface Item {
+  name: string;
+  value: number;
+  weight: number;
+  quantity: number;
+  [key: string]: any;
+}
+
+interface MapPayload {
+  input: string;
+  countries?: string;
+  type?: string;
+}
+
+interface RatePayload {
+  couriers: string;
+  items: Array<Item>;
+  origin_area_id?: string;
+  destination_area_id?: string;
+  origin_latitude?: number;
+  origin_longitude?: number;
+  destination_latitude?: number;
+  destination_longitude?: number;
+  origin_postal_code?: number;
+  destination_postal_code?: number;
+  [key: string]: any;
+}
+
+interface CreateLocationPayload {
+  name: string;
+  contact_name: string;
+  contact_phone: string;
+  address: string;
+  postal_code: string;
+  latitude: number;
+  longitude: number;
+  note?: string;
+  [key: string]: any;
+}
+
+interface UpdateLocationPayload {
+  name?: string;
+  contact_name?: string;
+  contact_phone?: string;
+  address?: string;
+  postal_code?: string;
+  latitude?: number;
+  longitude?: number;
+  note?: string;
+  [key: string]: any;
+}
+
+interface CreateDraftOrderPayload {
+  origin_contact_name: string;
+  origin_contact_phone: string;
+  origin_address: string;
+  destination_contact_name: string;
+  destination_contact_phone: string;
+  destination_address: string;
+  delivery_type: string;
+  items: Array<Item>;
+  origin_postal_code?: string;
+  origin_coordinate?: Coordinate;
+  destination_postal_code?: number;
+  destination_coordinate?: Coordinate;
+  destination_proof_of_delivery_note?: string;
+  [key: string]: any;
+}
+
+interface UpdateDraftOrderPayload {
+  origin_contact_name?: string;
+  origin_contact_phone?: string;
+  origin_address?: string;
+  destination_contact_name?: string;
+  destination_contact_phone?: string;
+  destination_address?: string;
+  delivery_type?: string;
+  items?: Array<Item>;
+  origin_postal_code?: string;
+  origin_coordinate?: Coordinate;
+  destination_postal_code?: number;
+  destination_coordinate?: Coordinate;
+  destination_proof_of_delivery_note?: string;
+  [key: string]: any;
+}
+
+interface OrderPayload {
+  origin_contact_name: string;
+  origin_contact_phone: string;
+  origin_address: string;
+  destination_contact_name: string;
+  destination_contact_phone: string;
+  destination_address: string;
+  courier_company: string;
+  courier_type: string;
+  delivery_type: string;
+  items: Array<Item>;
+  origin_postal_code?: string;
+  origin_coordinate?: Coordinate;
+  origin_area_id?: string;
+  destination_postal_code?: number;
+  destination_coordinate?: Coordinate;
+  destination_proof_of_delivery_note?: string;
+  [key: string]: any;
+}
+
+interface BiteshipError {
+  status: number;
+  success: boolean;
+  error?: string;
+  code?: number;
+  [key: string]: any;
+}
+
+interface BiteshipResponse {
+  status: number;
+  success: boolean;
+  [key: string]: any;
+}
+
 declare class Biteship {
   static baseUrl: string;
 
@@ -15,25 +142,38 @@ declare class Biteship {
 
   private _reset(): void;
 
-  action(name: string): this;
+  action(name: BiteshipAction): this;
 
-  maps(payload: {
-    input: string;
-    countries?: string;
-    type?: string;
-  }): this;
+  maps(payload: MapPayload): this;
 
-  rates(payload: {
-    couriers: string;
-    items: any[];
-    [key: string]: any;
-  }): this;
+  rates(payload: RatePayload): this;
 
-  locations(payload?: object | null, id?: string): this;
+  // For creating a new location
+  locations(payload: CreateLocationPayload): this;
+  // For update a location
+  locations(payload: UpdateLocationPayload, id: string): this;
+  // For retrieve or delete location
+  locations(payload: null, id: string): this;
+  // The actual implementation signature
+  locations(payload?: CreateLocationPayload | UpdateLocationPayload | null, id?: string): this;
 
-  draftOrders(payload?: object | null, id?: string, customPath?: string): this;
+  // For creating a new draft order
+  draftOrders(payload: CreateDraftOrderPayload): this;
+  // For updating an existing draft order
+  draftOrders(payload: UpdateDraftOrderPayload, id: string): this;
+  // For retrieving and deleting a draft order
+  draftOrders(payload: null, id: string): this;
+  // For retrieving with rates and confirming a draft order (with customPath)
+  draftOrders(payload: null, id: string, customPath: string): this;
+  // The actual implementation signature
+  draftOrders(payload?: CreateDraftOrderPayload | UpdateDraftOrderPayload | null, id?: string, customPath?: string): this;
 
-  orders(payload?: object | null, id?: string): this;
+  // For creating a new order
+  orders(payload: OrderPayload): this;
+  // For retrieving and deleting an order
+  orders(payload: null, id: string): this;
+  // The actual implementation signature
+  orders(payload?: OrderPayload | null, id?: string): this;
 
   couriers(): this;
 
@@ -51,13 +191,9 @@ declare class Biteship {
     data?: any;
   };
 
-  send(callback: (error: any, response?: any) => void): void;
+  send(callback: (error: BiteshipError | null, response?: BiteshipResponse) => void): void;
 
-  sendAsync(): Promise<{
-    status: number;
-    success: boolean;
-    [key: string]: any;
-  }>;
+  sendAsync(): Promise<BiteshipResponse>;
 }
 
 export = Biteship;
