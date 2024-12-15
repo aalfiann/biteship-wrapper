@@ -1,6 +1,6 @@
 {
   "name": "biteship-wrapper",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Biteship API wrapper library for NodeJS",
   "main": "src/biteship.js",
   "types": "src/biteship.d.ts",
@@ -24,7 +24,10 @@
   },
   "homepage": "https://github.com/aalfiann/biteship-wrapper",
   "dependencies": {
-    "axios": "^1.7.9"
+    "axios": "^1.7.9",
+    "recacheman": "^2.3.5",
+    "recacheman-file": "^0.2.5",
+    "recacheman-redis": "^3.1.0"
   },
   "devDependencies": {
     "mocha": "^11.0.1",

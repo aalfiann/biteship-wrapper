@@ -1,4 +1,12 @@
+import Cacheman from 'recacheman';
+
 type BiteshipAction = 'create' | 'retrieve' | 'update' | 'delete' | 'confirm';
+
+interface CacheConfig {
+  namespace?: string;
+  engine?: 'memory' | 'file' | 'redis';
+  [key: string]: any;
+}
 
 interface Coordinate {
   latitude: number;
@@ -134,13 +142,22 @@ declare class Biteship {
   private url: string;
   private payload: any;
   private method: string;
+  private _keycache: string | undefined;
+  private _ttl: number | undefined;
+  private cacheman: Cacheman;
+  private cache_config: CacheConfig;
 
   constructor(config: {
     api_key: string;
     api_version?: string;
+    cache_config?: CacheConfig;
   });
 
+  private _hash(text: string): string;
   private _reset(): void;
+  private _handleResponse(err: any, res?: any): BiteshipResponse;
+  private _sendReqCallback(_cb: (error: BiteshipError | null, response?: BiteshipResponse) => void): void;
+  private _sendReqPromise(): Promise<BiteshipResponse>;
 
   action(name: BiteshipAction): this;
 
@@ -190,6 +207,8 @@ declare class Biteship {
     };
     data?: any;
   };
+
+  cache(ttl: number): this;
 
   send(callback: (error: BiteshipError | null, response?: BiteshipResponse) => void): void;
 

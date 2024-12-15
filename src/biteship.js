@@ -1,6 +1,8 @@
 'use strict';
 
+const crypto = require('crypto');
 const axios = require('axios');
+const Cacheman = require('recacheman')
 
 class Biteship {
   static baseUrl = 'https://api.biteship.com';
@@ -12,8 +14,12 @@ class Biteship {
   * Note:
   * Example required config
   * {
-  *   api_key: "",      [required], you can get it from biteship dashboard.
-  *   api_version: "v1" [optional], default is v1.
+  *   api_key: "",              [required] you can get it from biteship dashboard.
+  *   api_version: "v1"         [optional] default is v1.
+  *   cache_config: {           [optional]
+  *     namespace: 'biteship',  [required] default is "biteship".
+  *     engine: '',             [required] "memory" | "file" | "redis". Default is using memory.
+  *   }
   * }
   */
   constructor(config) {
@@ -30,9 +36,29 @@ class Biteship {
       if(!this.api_version) {
         this.api_version = 'v1';
       }
+      if(!this.cache_config) {
+        this.cache_config = {
+          namespace: 'biteship',
+          engine: 'memory'
+        };
+      }
+      if(!this.cache_config.namespace) {
+        this.cache_config.namespace = 'biteship';
+      }
+      if(!this.cache_config.engine) {
+        this.cache_config.engine = 'memory';
+      }
+      this.cacheman = new Cacheman(this.cache_config.namespace, this.cache_config);
     } else {
       throw new Error('Config must be an object type!');
     }
+  }
+
+  /**
+  * Simple Hash with SHA256
+  */
+  _hash(text) {
+    return crypto.createHash('sha256').update(text).digest('hex');
   }
 
   /**
@@ -42,6 +68,8 @@ class Biteship {
     this.url = '';
     this.payload = null;
     this.method = null;
+    this._keycache = undefined;
+    this._ttl = undefined;
   }
 
   /**
@@ -318,22 +346,88 @@ class Biteship {
   }
 
   /**
+  * Cache
+  * @param {number} ttl   this value is in seconds
+  * @returns {this}
+  */
+  cache(ttl) {
+    if(this.method === 'get') {
+      this._keycache = this._hash(this.url);
+      this._ttl = ttl;
+    }
+    return this;
+  }
+
+  /**
   * Build request
   * @returns {object}
   */
   _buildReq() {
-    const req = {
+    return {
       method: this.method,
       url: this.url,
       headers: {
         'authorization': this.api_key,
         'content-type': 'application/json'
-      }
+      },
+      ...(this.payload && { data: this.payload })
     };
-    if(this.payload) {
-      req.data = this.payload;
+  }
+
+  /**
+  * Handle API response and errors
+  * @param {*} err
+  * @param {*} res
+  * @returns {object}
+  */
+  _handleResponse(err, res) {
+    if (!err) {
+      const response = { status: res.status, ...res.data };
+      if (this._keycache) {
+        this.cacheman.set(this._keycache, response, this._ttl);
+      }
+      return response;
     }
-    return req;
+
+    if (err.response) {
+      return { status: err.response.status, ...err.response.data };
+    }
+
+    return {
+      status: err.request ? 503 : 500,
+      success: false,
+      error: err.request ? 'No response received from server' : 'Something went wrong',
+      code: 0
+    };
+  }
+
+  /**
+  * Sending request as callback
+  * @param {callback} _cb
+  * @returns {callback}
+  */
+  _sendReqCallback(_cb) {
+    axios(this._buildReq())
+      .then(res => {
+        if (_cb && typeof _cb === 'function') {
+          _cb(null, this._handleResponse(null, res));
+        }
+      })
+      .catch(err => {
+        if (_cb && typeof _cb === 'function') {
+          _cb(this._handleResponse(err));
+        }
+      });
+  }
+
+  /**
+  * Sending request as promise
+  * @returns {Promise}
+  */
+  _sendReqPromise() {
+    return axios(this._buildReq())
+      .then(res => this._handleResponse(null, res))
+      .catch(err => Promise.reject(this._handleResponse(err)));
   }
 
   /**
@@ -342,71 +436,36 @@ class Biteship {
   * @returns {callback}
   */
   send(_cb) {
-    axios(this._buildReq())
-      .then((res) => {
-        let resultResponse = Object.assign({ status: res.status }, res.data);
-        if (_cb && typeof _cb === 'function') {
-          _cb(null, resultResponse);
-        }
-      })
-      .catch((err) => {
-        let resultError = null;
-        if(err.response) {
-          resultError = Object.assign({status: err.response.status}, err.response.data);
-        } else if(err.request) {
-          resultError = {
-            status: 503,
-            success: false,
-            error: 'No response received from server',
-            code: 0
-          };
+    if(this._keycache !== undefined && this._keycache !== null) {
+      this.cacheman.get(this._keycache, function (error, value) {
+        if (error) return _cb(error);
+        if (value) {
+          return _cb(null, value);
         } else {
-          resultError = {
-            status: 500,
-            success: false,
-            error: 'Something went wrong',
-            code: 0
-          };
+          return this._sendReqCallback(_cb);
         }
-        if (_cb && typeof _cb === 'function') {
-          _cb(resultError);
-        }
-      });
+      }.bind(this));
+    } else {
+      return this._sendReqCallback(_cb);
+    }
   }
 
   /**
   * Send Async Request (promise based)
   * @returns {Promise}
   */
-  sendAsync() {
-    return new Promise((resolve, reject) => {
-      axios(this._buildReq())
-        .then((res) => {
-          let resultResponse = Object.assign({ status: res.status }, res.data);
-          resolve(resultResponse);
-        })
-        .catch((err) => {
-          let resultError = null;
-          if(err.response) {
-            resultError = Object.assign({status: err.response.status}, err.response.data);
-          } else if(err.request) {
-            resultError = {
-              status: 503,
-              success: false,
-              error: 'No response received from server',
-              code: 0
-            };
-          } else {
-            resultError = {
-              status: 500,
-              success: false,
-              error: 'Something went wrong',
-              code: 0
-            };
-          }
-          reject(resultError);
-        });
-    });
+  async sendAsync() {
+    try {
+      if (this._keycache) {
+        const cachedValue = await this.cacheman.get(this._keycache);
+        if (cachedValue) {
+          return cachedValue;
+        }
+      }
+      return await this._sendReqPromise();
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

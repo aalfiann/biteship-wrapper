@@ -10,6 +10,7 @@ Biteship API wrapper library for NodeJS
 ## Features
 - Async Await or Promise Support
 - Typescript Support
+- Built-in Cache (Memory, File or Redis)
 
 ### Install
 ```
@@ -25,18 +26,58 @@ const Biteship = require('biteship-wrapper');
 // or
 // import Biteship from 'biteship-wrapper';
 
-const options = {
+const config = {
   api_key: "YOUR_API_KEY"
 };
 
-const biteship = new Biteship(options);
+const biteship = new Biteship(config);
 ```
+
+### Setup Cache Config
+```javascript
+// simple cache with memory or file
+const config = {
+  api_key: "YOUR_API_KEY",
+  cache_config: {
+    namespace: 'biteship',
+    engine: 'memory', // you can use "memory", "file" or "redis"
+  }
+};
+
+// cache using redis
+// Example url connection redis:
+// redis[s]://[[username][:password]@][host][:port][/db-number]
+const config = {
+  api_key: "YOUR_API_KEY",
+  cache_config: {
+    namespace: 'biteship',
+    engine: 'redis',
+    url: 'redis://127.0.0.1:6379' // this url is required for redis connection.
+  }
+};
+```
+
+Note:
+- Cache will work only for any request with method `GET`. In this case, it will work for most action `retrieve`.  
+But, its won't running automatically even you have already set the `cache_config`.
+- If the response is false or error, then it would not getting cached.
+- This library is not included with Redis Client library, you might required to install manually.
+```bash
+npm install redis
+```
+- Please see [Redis 4.x Client Configuration Options](https://github.com/redis/node-redis/blob/master/docs/client-configuration.md).
 
 #### Example to use Maps API
 
 **Using Callback**
 ```javascript
 biteship.action('retrieve').maps({ input: 'jakarta selatan' }).send(function(err, res) {
+  if(err) return console.log(err);
+  console.log(res);
+});
+
+// with cache for 1 hour or 3600 seconds.
+biteship.action('retrieve').maps({ input: 'jakarta selatan' }).cache(3600).send(function(err, res) {
   if(err) return console.log(err);
   console.log(res);
 });
@@ -51,12 +92,29 @@ biteship.action('retrieve').maps({ input: 'jakarta selatan' }).sendAsync()
   .catch(err => {
     console.log(err);
   });
+
+// with cache for 1 hour or 3600 seconds.
+biteship.action('retrieve').maps({ input: 'jakarta selatan' }).cache(3600).sendAsync()
+  .then(res => {
+    console.log(res);
+  })
+  .catch(err => {
+    console.log(err);
+  });
 ```
 
 **Using Async Await**
 ```javascript
 try {
   const res = await biteship.action('retrieve').maps({ input: 'jakarta selatan' }).sendAsync();
+  console.log(res);
+} catch(err) {
+  console.log(err);
+}
+
+// with cache for 1 hour or 3600 seconds.
+try {
+  const res = await biteship.action('retrieve').maps({ input: 'jakarta selatan' }).cache(3600).sendAsync();
   console.log(res);
 } catch(err) {
   console.log(err);
@@ -107,6 +165,7 @@ Note:
 - `couriers(): this`
 - `trackings(id: string): this`
 - `publicTrackings(waybillId: string, courierId: string): this`
+- `cache(ttl: number): this`
 - `send(callback: (error: any, response?: any) => void): void`
 - `sendAsync(): Promise<{status: number;success: boolean;[key: string]: any;}>`
 

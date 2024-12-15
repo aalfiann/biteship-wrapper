@@ -35,4 +35,28 @@ describe('Biteship configuration test', function () {
       api_version: 'v2'
     }).api_version, 'v2');
   });
+
+  it('cache config test', () => {
+    assert.strictEqual(new Biteship({
+      api_key: 'xxx'
+    }).cache_config.engine, 'memory');
+
+    assert.strictEqual(new Biteship({
+      api_key: 'xxx'
+    }).cache_config.namespace, 'biteship');
+
+    assert.strictEqual(new Biteship({
+      api_key: 'xxx',
+      cache_config: {
+        namespace: 'tester'
+      }
+    }).cache_config.namespace, 'tester');
+
+    assert.strictEqual(new Biteship({
+      api_key: 'xxx',
+      cache_config: {
+        engine: 'file'
+      }
+    }).cache_config.engine, 'file');
+  });
 });
