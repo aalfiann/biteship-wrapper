@@ -364,6 +364,7 @@ class Biteship {
   */
   _buildReq() {
     return {
+      family: 4, // force to use IPv4
       method: this.method,
       url: this.url,
       headers: {
