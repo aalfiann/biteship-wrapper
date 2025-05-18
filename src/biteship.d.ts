@@ -1,6 +1,6 @@
 import Cacheman from 'recacheman';
 
-type BiteshipAction = 'create' | 'retrieve' | 'update' | 'delete' | 'confirm';
+type BiteshipAction = 'create' | 'retrieve' | 'update' | 'delete' | 'confirm' | 'cancel';
 
 interface CacheConfig {
   namespace?: string;
@@ -119,6 +119,11 @@ interface OrderPayload {
   [key: string]: any;
 }
 
+interface CancellationReasonPayload {
+  code: string;
+  reason?: string;
+}
+
 interface BiteshipError {
   status: number;
   success: boolean;
@@ -190,7 +195,9 @@ declare class Biteship {
   // For retrieving and deleting an order
   orders(payload: null, id: string): this;
   // The actual implementation signature
-  orders(payload?: OrderPayload | null, id?: string): this;
+  orders(payload?: OrderPayload | CancellationReasonPayload | null, id?: string): this;
+
+  ordersCancellationReasons(lang: string): this;
 
   couriers(): this;
 

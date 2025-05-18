@@ -11,9 +11,6 @@ jobs:
       - image: cimg/node:16.19.0   # Primary execution image
     steps:
       - checkout
-      - run:
-          name: Update npm
-          command: 'sudo npm install -g npm@8.19.3'
       - restore_cache:
           key: dependency-cache-{{ checksum "package-lock.json" }}
       - run:
@@ -24,10 +21,7 @@ jobs:
           paths:
             - ./node_modules
       - run:
-          name: Unit test
+          name: Run test
           command: npm test
-      - run:
-          name: Code Coverage
-          command: './node_modules/.bin/nyc report --reporter=text-lcov'
       - store_artifacts:
           path: coverage

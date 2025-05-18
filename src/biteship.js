@@ -255,6 +255,7 @@ class Biteship {
     this._reset();
     id = (id === undefined ? '' : '/' + id);
     payload = (payload === undefined ? null : payload);
+    let doCancel = '';
     if(payload && typeof payload !== 'object') {
       throw new Error('payload should be an object!');
     }
@@ -280,10 +281,39 @@ class Biteship {
         }
         this.method = 'delete';
         break;
+      case 'cancel':
+        if(!payload) {
+          throw new Error('payload is required!');
+        }
+        if(!id) {
+          throw new Error('id is required!');
+        }
+        doCancel = '/cancel';
+        this.method = 'post';
+        this.payload = payload;
+        break;
       default:
         throw new Error('Action not available!');
     }
-    this.url = Biteship.baseUrl + '/' + this.api_version + '/orders' + id;
+    this.url = Biteship.baseUrl + '/' + this.api_version + '/orders' + id + doCancel;
+    return this;
+  }
+
+  /**
+  * Orders Cancellation Reasons API
+  * @param {string} lang
+  * @returns {this}
+  */
+  ordersCancellationReasons(lang) {
+    this._reset();
+    if(this._action !== 'retrieve') {
+      throw new Error('Action not available!');
+    }
+    if(!lang || typeof lang !== 'string') {
+      throw new Error('lang is required and should be a string!');
+    }
+    this.url = Biteship.baseUrl + '/' + this.api_version + '/orders/cancellation_reasons?lang=' + lang;
+    this.method = 'get';
     return this;
   }
 
@@ -313,7 +343,7 @@ class Biteship {
     if(this._action !== 'retrieve') {
       throw new Error('Action not available!');
     }
-    if(!id && typeof id !== 'string') {
+    if(!id || typeof id !== 'string') {
       throw new Error('id is required and should be a string!');
     }
     this.url = Biteship.baseUrl + '/' + this.api_version + '/trackings/' + id;
@@ -333,10 +363,10 @@ class Biteship {
       throw new Error('Action not available!');
     }
 
-    if(!waybillId && typeof waybillId !== 'string') {
+    if(!waybillId || typeof waybillId !== 'string') {
       throw new Error('waybillId is required and should be a string!');
     }
-    if(!courierId && typeof courierId !== 'string') {
+    if(!courierId || typeof courierId !== 'string') {
       throw new Error('courierId is required and should be a string!');
     }
 

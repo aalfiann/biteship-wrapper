@@ -5,6 +5,8 @@ const Biteship = require('../src/biteship.js');
 
 describe('Biteship send async test', function () {
   it('send with wrong api_key should return status 400 (promise based)', () => {
+    this.timeout(10000);
+
     const biteship = new Biteship({
       api_key: 'xxx'
     });
@@ -22,6 +24,8 @@ describe('Biteship send async test', function () {
   });
 
   it('send with wrong api_key should return status 400 (async await based)', async () => {
+    this.timeout(10000);
+
     const biteship = new Biteship({
       api_key: 'xxx'
     });
@@ -38,6 +42,8 @@ describe('Biteship send async test', function () {
   });
 
   it('send with payload and wrong api_key should return status 401 (async await based)', async () => {
+    this.timeout(10000);
+
     const biteship = new Biteship({
       api_key: 'xxx'
     });

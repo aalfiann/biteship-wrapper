@@ -16,5 +16,8 @@ describe('Biteship action test', function () {
     assert.throws(function () {
       biteship.action()
     }, Error, 'Error thrown');
+    assert.throws(function () {
+      biteship.action(1)
+    }, Error, 'Error thrown');
   });
 });

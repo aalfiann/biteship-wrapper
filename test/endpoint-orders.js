@@ -52,4 +52,36 @@ describe('Endpoint orders test', function () {
       biteship.action('delete').orders('')
     }, Error, 'Error thrown');
   });
+
+  it('orders - cancel', () => {
+    const biteship = new Biteship(options);
+    const result = biteship.action('cancel').orders({}, 'xxx');
+    assert.strictEqual(result.url, 'https://api.biteship.com/v1/orders/xxx/cancel');
+    assert.strictEqual(result.method, 'post');
+    assert.throws(function () {
+      biteship.action('cancel').orders()
+    }, Error, 'Error thrown');
+    assert.throws(function () {
+      biteship.action('cancel').orders('')
+    }, Error, 'Error thrown');
+    assert.throws(function () {
+      biteship.action('cancel').orders(1)
+    }, Error, 'Error thrown');
+  });
+
+  it('orders - cancellation reasons', () => {
+    const biteship = new Biteship(options);
+    const result = biteship.action('retrieve').ordersCancellationReasons('en');
+    assert.strictEqual(result.url, 'https://api.biteship.com/v1/orders/cancellation_reasons?lang=en');
+    assert.strictEqual(result.method, 'get');
+    assert.throws(function () {
+      biteship.action('retrieve').ordersCancellationReasons()
+    }, Error, 'Error thrown');
+    assert.throws(function () {
+      biteship.action('retrieve').ordersCancellationReasons('')
+    }, Error, 'Error thrown');
+    assert.throws(function () {
+      biteship.action('retrieve').ordersCancellationReasons(1);
+    }, Error, 'Error thrown');
+  });
 });

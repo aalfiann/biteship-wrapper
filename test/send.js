@@ -5,6 +5,8 @@ const Biteship = require('../src/biteship.js');
 
 describe('Biteship send test', function () {
   it('send with wrong api_key should return status 400 (callback based)', () => {
+    this.timeout(10000);
+
     const biteship = new Biteship({
       api_key: 'xxx'
     });
@@ -18,6 +20,8 @@ describe('Biteship send test', function () {
   });
 
   it('send with payload and wrong api_key should return status 401 (callback based)', async () => {
+    this.timeout(10000);
+
     const biteship = new Biteship({
       api_key: 'xxx'
     });

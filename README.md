@@ -65,7 +65,7 @@ But, its won't running automatically even you have already set the `cache_config
 ```bash
 npm install redis
 ```
-- Please see [Redis 4.x Client Configuration Options](https://github.com/redis/node-redis/blob/master/docs/client-configuration.md).
+- Please see [Redis Client Configuration Options](https://github.com/redis/node-redis/blob/master/docs/client-configuration.md).
 
 #### Example to use Maps API
 
@@ -162,6 +162,7 @@ Note:
 - `locations(payload?: object | null, id?: string): this`
 - `draftOrders(payload?: object | null, id?: string, customPath?: string): this`
 - `orders(payload?: object | null, id?: string): this`
+- `ordersCancellationReasons(lang: string): this`
 - `couriers(): this`
 - `trackings(id: string): this`
 - `publicTrackings(waybillId: string, courierId: string): this`
@@ -398,6 +399,30 @@ biteship.action('retrieve').orders(null, '5dd599ebdefcd4158eb8470b')
 **Delete**
 ```javascript
 biteship.action('delete').orders(null, '5dd599ebdefcd4158eb8470b')
+  .send(function(err, res) {
+    if(err) return console.log(err);
+    console.log(res);
+});
+```
+
+**Cancel**
+```javascript
+biteship.action('cancel').orders({
+  code: 'change_courier',
+  reason: 'Want to change courier'
+}, '5dd599ebdefcd4158eb8470b')
+  .send(function(err, res) {
+    if(err) return console.log(err);
+    console.log(res);
+});
+```
+Note:
+- Please see the payload to cancel orders [here](https://biteship.com/id/docs/api/orders/delete#cancellation-reasons-in-english).
+
+#### Using Orders Cancellation Reasons API
+**Retrieve**
+```javascript
+biteship.action('retrieve').ordersCancellationReasons('en')
   .send(function(err, res) {
     if(err) return console.log(err);
     console.log(res);

@@ -20,6 +20,12 @@ describe('Endpoint public trackings test', function () {
       biteship.action('retrieve').publicTrackings('')
     }, Error, 'Error thrown');
     assert.throws(function () {
+      biteship.action('retrieve').publicTrackings(1)
+    }, Error, 'Error thrown');
+    assert.throws(function () {
+      biteship.action('retrieve').publicTrackings(1, 2)
+    }, Error, 'Error thrown');
+    assert.throws(function () {
       biteship.action('create').publicTrackings()
     }, Error, 'Error thrown');
   });
