@@ -7,6 +7,11 @@
 ![NPM download total](https://img.shields.io/npm/dt/biteship-wrapper.svg)  
 Biteship API wrapper library for NodeJS
 
+| Version | Node.JS | Redis Client Library Version |
+|---|---|---|
+| 1.x | 16, 18, 20 | 4.x |
+| 2.x | 20, 22 | 5.x |
+
 ## Features
 - Async Await or Promise Support
 - Typescript Support
